@@ -21,6 +21,15 @@ class Ingredient
       safe_array.include?( @name.downcase )
   end
 
+  def self.parse(ingredient_string)
+    tokens = ingredient_string.split(" ")
+    quantity = tokens[0].to_i
+    unit = tokens[1]
+    name = tokens[2]
+
+    Ingredient.new( quantity, unit, name )
+  end
+
 end
 
 
@@ -32,24 +41,23 @@ class Recipe
   end
 
   def summary
-    puts @name
-    puts
-    puts "Ingredients"
+    summary = "#{@name}\n\n"
+    summary += "Ingredients\n"
     @ingredients.each do |ingredient|
-      puts " - #{ingredient.summary}"
+      summary += " - #{ingredient.summary}\n"
     end
-    puts
-    puts "Instructions"
-    counter = 1
-    @instructions.each do |item|
-      puts "#{counter}. #{item}"
-      counter += 1
+    summary += "\nInstructions\n"
+    @instructions.each_with_index do |item, index|
+      summary += "#{index + 1}. #{item}\n"
+    end
+    if safe?
+      summary += "\nThis is safe to eat."
+    else
+      summary += "\nDanger! DO NOT EAT!!!"
     end
   end
 
   def safe?
-      binding.pry
-      #safe_array.include?( @name.downcase )
       counter = 0
       @ingredients.each do |ingredient_name|
         unless ingredient_name.is_it_safe?
@@ -67,7 +75,8 @@ ingredients = [
     Ingredient.new(1.5, "lb(s)", "Brussels sprouts"),
     Ingredient.new(3.0, "tbspn(s)", "Whiskey"),
     Ingredient.new(0.75, "tspn(s)", "Whiskey"),
-    Ingredient.new(0.5, "tspn(s)", "Kosher salt")
+    Ingredient.new(0.5, "tspn(s)", "Kosher salt"),
+    Ingredient.parse("1.0 cup(s) sugar")
 ]
 
 instructions = [
@@ -84,15 +93,9 @@ instructions = [
 
 recipe = Recipe.new( name, instructions, ingredients )
 
-recipe.summary
-
-bs = Ingredient.new(1.5, "lb(s)", "Brussels sprouts");
-wh = Ingredient.new(1.5, "bottle(s)", "Whiskey");
-pot = Ingredient.new(1.5, "lb(s)", "potatoes");
-#puts recipe.safe?
-
-if recipe.safe?
-  puts "Safe to Eat"
-else
-  puts "Danger!!! Do not eat!!!"
-end
+puts recipe.summary
+#
+# bs = Ingredient.new(1.5, "lb(s)", "Brussels sprouts");
+# wh = Ingredient.new(1.5, "bottle(s)", "Whiskey");
+# pot = Ingredient.new(1.5, "lb(s)", "potatoes");
+# #puts recipe.safe?
